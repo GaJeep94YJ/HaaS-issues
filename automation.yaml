@@ -28,7 +28,7 @@ action:
 
 ####sound alarm siren when armed home or away####
 - alias: trigger alarm while armed home or away
-trigger: 
+  trigger: 
   - platform: state
     entity_id: binary_sensor.garage_door
     to: 'on'
@@ -56,23 +56,34 @@ trigger:
   - platform: state
     entity_id: binary_sensor.sun_room_glass
     to: 'on'
-    condition:
-      condition: or
-      conditions: 
-       - condition: state
-         entity_id: alarm_control_panel.house
-         state: armed_away
-       - condition: state
-         entity_id: alarm_control_panel.house
-         state: armed_home
-    action:
-      service: alarm_control_panel.alarm_trigger
-      entity_id: alarm_control_panel.house
+  condition:
+    condition: or
+    conditions: 
+      - condition: state
+        entity_id: alarm_control_panel.house
+        state: armed_away
+      - condition: state
+        entity_id: alarm_control_panel.house
+        state: armed_home
+  action:
+    service: alarm_control_panel.alarm_trigger
+    entity_id: alarm_control_panel.house
+
 - alias: Alarm Triggered
-trigger: 
-   - platform: state
-     entity_id: alarm_control_panel.house
-     to: 'triggered'
-    action: 
-      entity_id: switch.siren
-        service: switch on
+  trigger: 
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'triggered'
+  action: 
+    entity_id: switch.siren
+    service: switch.turn_on
+
+
+- alias: Alarm Triggered
+  trigger: 
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'triggered'
+  action: 
+    entity_id: switch.siren
+    service: switch.turn_on
