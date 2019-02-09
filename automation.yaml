@@ -20,42 +20,42 @@ trigger:
   - entity_id: binary_sensor.sun_room_glass
     platform: state
 condition: []
-action:
-- alias: ''
-  data:
-    entity_id: switch.Door_Chime
-  service: switch.turn_on
+  action:
+    - alias: ''
+    data:
+      entity_id: switch.Door_Chime
+    service: switch.turn_on
 
 ####sound alarm siren when armed home or away####
 - alias: trigger alarm while armed home or away
   trigger: 
-  - platform: state
-    entity_id: binary_sensor.garage_door
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.front_door
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.1st_floor_window
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.basement_door
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.basement_garage_door
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.basement_windows
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.breakfast_door
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.sliding_glass_door
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.sun_room_glass
-    to: 'on'
+    - platform: state
+      entity_id: binary_sensor.garage_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.front_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.1st_floor_window
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.basement_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.basement_garage_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.basement_windows
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.breakfast_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.sliding_glass_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.sun_room_glass
+      to: 'on'
   condition:
     condition: or
     conditions: 
@@ -71,9 +71,9 @@ action:
 
 - alias: Alarm Triggered
   trigger: 
-  - platform: state
-    entity_id: alarm_control_panel.house
-    to: 'triggered'
+    - platform: state
+      entity_id: alarm_control_panel.house
+      to: 'triggered'
   action: 
     entity_id: switch.siren
     service: switch.turn_on
@@ -81,9 +81,9 @@ action:
 
 - alias: Alarm Triggered
   trigger: 
-  - platform: state
-    entity_id: alarm_control_panel.house
-    to: 'triggered'
+    - platform: state
+      entity_id: alarm_control_panel.house
+      to: 'triggered'
   action: 
     entity_id: switch.siren
     service: switch.turn_on
