@@ -1,0 +1,123 @@
+#####alarm beep when door opened or closed####
+- alias: DoorChime
+  trigger:
+    - entity_id: binary_sensor.garage_door
+      platform: state
+    - entity_id: binary_sensor.front_door
+      platform: state
+    - entity_id: binary_sensor.1st_floor_windows
+      platform: state
+    - entity_id: binary_sensor.basement_door
+      platform: state
+    - entity_id: binary_sensor.basement_garage_door
+      platform: state
+    - entity_id: binary_sensor.basement_windows
+      platform: state
+    - entity_id: binary_sensor.breakfast_door
+      platform: state
+    - entity_id: binary_sensor.sliding_glass_door
+      platform: state
+    - entity_id: binary_sensor.sun_room_glass
+      platform: state
+  condition: []
+  action:
+    service: switch.turn_on    
+    data:
+      entity_id: switch.Door_Chime
+    
+
+####sound alarm siren when armed home or away####
+- alias: trigger alarm while armed home or away
+  trigger: 
+    - platform: state
+      entity_id: binary_sensor.garage_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.front_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.1st_floor_window
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.basement_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.basement_garage_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.basement_windows
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.breakfast_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.sliding_glass_door
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.sun_room_glass
+      to: 'on'
+  condition:
+    condition: or
+    conditions: 
+      - condition: state
+        entity_id: alarm_control_panel.house
+        state: armed_away
+      - condition: state
+        entity_id: alarm_control_panel.house
+        state: armed_home
+  action:
+    service: alarm_control_panel.alarm_trigger
+    entity_id: alarm_control_panel.house
+
+#turn on siren when triggered
+- alias: Alarm Triggered
+  trigger: 
+    - platform: state
+      entity_id: alarm_control_panel.house
+      to: 'triggered'
+  action: 
+    entity_id: switch.siren
+    service: switch.turn_on
+    
+- alias: Alarm Triggered
+  trigger: 
+    - platform: state
+      entity_id: alarm_control_panel.house
+      to: 'triggered'
+  action: 
+    - service: switch.turn_on
+      entity_id: switch.siren
+#    - delay: '00:05:00'
+#    - service: switch.turn_off
+#      entity_id: switch.siren
+
+# Turn off siren when disarmed.
+- alias: alarm_auto_noise_off
+#  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.house
+      from: 'triggered'
+      to: 'armed_home'
+    - platform: state
+      entity_id: alarm_control_panel.house
+      from: 'triggered'
+      to: 'armed_away'
+    - platform: state
+      entity_id: alarm_control_panel.house
+      from: 'triggered'
+      to: 'disarmed'
+  action:
+    - service: switch.turn_off
+      entity_id: switch.siren
+
+- alias: Alarm Disarmed
+  trigger: 
+    - platform: state
+      entity_id: alarm_control_panel.house
+      from: 'triggered'
+      to: 'disarmed'
+  action: 
+    service: switch.turn_off
+    entity_id: switch.siren
+    
