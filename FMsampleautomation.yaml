@@ -1,0 +1,126 @@
+# Daily Test Notification at noon
+#- alias: Notify iOS app
+#  trigger:
+#    platform: time
+#    at: '12:00:00'
+#  action:
+#    service: notify.iphones
+#    data:
+#      title: "Smart Home Alert"
+#      message: "This is Your Daily Test Notification at Noon!"
+#      data:
+#        push:
+#          badge: 1
+#          sound: "US-EN-Morgan-Freeman-Vacate-The-Premises.wav"
+
+# Delay Start of Home Kit for 5 minutes on HA Restart
+- alias: Homekit Delayed Start
+  trigger:
+    - event: start
+      platform: homeassistant
+  condition: []
+  action:
+    - delay: 00:05
+    - service: homekit.start
+
+# Alarm Automations
+- id: alarm_armed_away
+  alias: '[Alarm] Away Mode Armed'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'armed_away'
+  action:
+  - data:
+      message: 'The house alarm has been switched on in away mode. Goodbye.'
+    service: notify.none
+
+- id: alarm_armed_home
+  alias: '[Alarm] Home Mode Armed'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'armed_home'
+  action:
+  - data:
+      message: 'The house alarm has been switched on in home mode. Goodnight.'
+    service: notify.none
+
+- id: alarm_arming_away
+  alias: '[Alarm] Away Mode Arming'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'pending'
+  action:
+  - data:
+      message: 'House alarm activating, ensure all doors and windows are closed.'
+    service: notify.none
+
+- id: alarm_disarmed
+  alias: '[Alarm] Disarmed'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'disarmed'
+  action:
+  - service: switch.turn_off
+    entity_id: switch.siren
+  - data:
+      message: 'The house alarm has been Deactivated.'
+    service: notify.none
+
+- id: alarm_warning
+  alias: '[Alarm] Warning'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'warning'
+  action:
+  - data:
+      message: 'Warning, the house alarm has been tripped. Please deactivate.'
+    service: notify.none
+
+- id: alarm_triggered
+  alias: '[Alarm] Triggered'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'triggered'
+  action:
+    - service: notify.iphones    
+      data:
+        message: 'ALARM TRIGGERED!!! {{ states[states.alarm_control_panel.house.attributes.changed_by.split(".")[0]][ states.alarm_control_panel.house.attributes.changed_by.split(".")[1]].name }}'
+        data:
+          push:
+            badge: 5
+            sound: "US-EN-Alexa-Motion-Detected-Generic.wav"
+            subtitle: "Press and Hold to Set Off Siren."
+            category: "setoff_alarm"
+          action_data:
+            entity_id: switch.siren
+
+# Notification Automations
+- id: sound_the_alarm
+  alias: Sound the alarm
+  initial_state: 'on'
+  trigger:
+    - platform: event
+      event_type: ios.notification_action_fired
+      event_data:
+        actionName: SOUNDALARM
+  action: 
+    service: switch.turn_on
+    entity_id: switch.siren
+
+- id: silence_the_alarm
+  alias: Silence the alarm
+  initial_state: 'on'
+  trigger:
+    - platform: event
+      event_type: ios.notification_action_fired
+      event_data:
+        actionName: SILENCEALARM
+  action: 
+    service: switch.turn_off
+    entity_id: switch.siren

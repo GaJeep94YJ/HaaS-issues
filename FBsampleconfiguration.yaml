@@ -1,0 +1,287 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Litchfield House
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 9
+  # metric for Metric, imperial for Imperial
+  unit_system: imperial
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: America/New_York
+  # Customization file
+  customize: !include customize.yaml
+      
+# Password Setup for iOS app
+  auth_providers:
+    - type: homeassistant
+# Uncomment next line if you want to enable legacy API password support
+#    - type: legacy_api_password
+
+# http setup
+#http:
+#  ip_ban_enabled: True
+#  login_attempts_threshold: 3
+#  api_password: !secret http_password
+
+# Show links to resources in log and frontend
+introduction:
+
+# Enables the frontend
+frontend:
+
+lovelace:
+  mode: yaml
+
+# Enables configuration UI
+config:
+
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+# http:
+#   base_url: example.duckdns.org:8123
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time
+history:
+
+# View all events in a logbook
+logbook:
+
+# System Monitor
+system_health:
+
+# Level of Log
+#logger:
+#  default: debug
+
+# Databse Management
+recorder:
+  purge_keep_days: 14
+  purge_interval: 1
+  exclude:
+    domains:
+      - automation
+      - group
+      - input_boolean
+      - zha
+      - zwave
+      - script
+    entities:
+      - sun.sun
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+sun:
+
+# Sensors
+sensor:
+  - platform: time_date
+    display_options:
+      - 'time'
+      - 'date'
+  # Weather Prediction
+  #- platform: openweathermap
+  #  api_key: !secret openweathermap_apikey
+  #  monitored_conditions:
+  #    - temperature
+  #    - clouds
+  - platform: darksky
+    name: "Litchfield House"
+    api_key: !secret darksky_apikey
+    forecast:
+      - 7
+    monitored_conditions:
+      - summary
+      - icon
+      - temperature
+      - temperature_high
+      - temperature_low
+      - wind_speed
+      - cloud_cover
+
+# Weather
+weather:
+  - platform: darksky
+    api_key: !secret darksky_apikey
+
+# Text to speech
+tts:
+  - platform: google
+
+# Cloud
+cloud:
+
+# Group
+group: !include groups.yaml
+
+# Automations
+automation: !include automation.yaml
+
+# Scripts
+script: !include scripts.yaml
+
+# Adds Configurator to HA
+panel_iframe:
+  configurator:
+    title: Configurator
+    icon: mdi:wrench
+    url: http://hassio.local:3218
+
+# Notifying Devices
+notify:
+  - name: iphones
+    platform: group
+    services:
+      - service: ios_johns_iphone
+      - service: ios_natalies_iphone
+
+# Enables Homekit
+homekit:
+  auto_start: false
+  filter:
+    include_domains:
+      - alarm_control_panel
+      - light
+      - binary_sensor
+      - switch
+      - zwave
+    exclude_domains:
+      - automation
+      - sensor
+      - script
+  entity_config:
+    alarm_control_panel.house:
+      code: !secret alarm_code_ha
+
+# Manual iOS Setup with Push
+ios:
+  push:
+    categories:
+      - name: Setoff Alarm
+        identifier: 'setoff_alarm'
+        actions:
+          - identifier: 'SOUNDALARM'
+            title: "Sound Alarm"
+            activationMode: 'background'
+            authenticationRequired: false
+            destructive: true
+            behavior: 'default'
+          - identifier: 'SILENCEALARM'
+            title: "Silence Alarm"
+            activationMode: 'background'
+            authenticationRequired: false
+            destructive: true
+            behavior: 'default'
+
+# Z-wave and Zigbee Controller (USB stick HUSBZB-1)
+zwave:
+  usb_path: /dev/ttyUSB0
+  network_key: !secret zwave_network_key
+
+zha:
+  usb_path: /dev/ttyUSB1
+  database_path: /config/zigbee.db
+
+# Emby Setup
+media_player:
+  - platform: emby
+    host: 192.168.1.100
+    api_key: !secret emby_apikey
+
+# Konnect Setup
+konnected:
+  access_token: !secret konnected_access_token
+  api_host: http://192.168.1.102:8123
+  devices:
+    - id: 807d3a3c98e4
+      binary_sensors:
+        - zone: 1
+          type: smoke
+          name: 'Smoke Alarm'
+        - zone: 2
+          type: gas
+          name: 'CO Alarm'
+        - zone: 3
+          type: door
+          name: 'Front Door'
+        - zone: 4
+          type: door
+          name: 'Inside Garage Door'
+        - zone: 5
+          type: sound
+          name: 'Glass Breaker'
+        - zone: 6
+          type: motion
+          name: 'Motion Detector'
+      switches:
+        - zone: out
+          name: siren
+    - id: 807d3a3c987a
+      binary_sensors:
+        - zone: 1
+          type: door
+          name: 'Outside Garage Door'
+        - zone: 2
+          type: door
+          name: 'Back Door'
+        - zone: 3
+          type: door
+          name: 'Closet'
+        - zone: 4
+          type: window
+          name: 'Office Windows'
+        - zone: 5
+          type: window
+          name: 'Downstairs Bedroom Windows'
+        - zone: 6
+          type: window
+          name: 'Living Room Windows'
+      switches:
+        - zone: out
+          name: 'Beep Beep'
+          momentary: 65
+          pause: 55
+          repeat: 4  
+    - id: 840d8e8678f7
+      binary_sensors:
+        - zone: 1
+          type: window
+          name: 'Kitchen Windows'
+        - zone: 2
+          type: window
+          name: 'Dining Room Windows'
+        - zone: 3
+          type: window
+          name: 'Master Bedroom Windows'
+        - zone: 4
+          type: window
+          name: 'Laundry Window'
+        - zone: 5
+          type: window
+          name: 'Upstairs Bedroom Windows'
+#        - zone: 6
+#          type: window
+#          name: 'Garage Windows'
+
+# Alarm Panel Setup
+alarm_control_panel: !include alarm.yaml
+
+panel_custom: !include panel_custom.yaml
+
