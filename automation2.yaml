@@ -103,7 +103,7 @@
       from: 'triggered'
       to: 'armed_away'
     - platform: state
-      entitiy_id: alarm_control_panel.house
+      entity_id: alarm_control_panel.house
       from: 'triggered'
       to: 'disarmed'
   action:
