@@ -78,37 +78,37 @@
     entity_id: switch.siren
     service: switch.turn_on
     
-- alias: Alarm Triggered
-  trigger: 
+#- alias: Alarm Triggered
+#  trigger: 
+#    - platform: state
+#      entity_id: alarm_control_panel.house
+#      to: 'triggered'
+#  action: 
+#    - service: switch.turn_on
+#      entity_id: switch.siren
+#    - delay: '00:05:00'
+#    - service: switch.turn_off
+#      entity_id: switch.siren
+#
+#- id: alarm_auto_noise_off
+- alias: alarm_auto_noise_off
+#  initial_state: true
+  trigger:
     - platform: state
       entity_id: alarm_control_panel.house
-      to: 'triggered'
-  action: 
-    - service: switch.turn_on
-      entity_id: switch.siren
-    - delay: '00:05:00'
+      from: 'triggered'
+      to: 'armed_home'
+    - platform: state
+      entity_id: alarm_control_panel.house
+      from: 'triggered'
+      to: 'armed_away'
+    - platform: state
+      entitiy_id: alarm_control_panel.house
+      from: 'triggered'
+      to: 'disarmed'
+  action:
     - service: switch.turn_off
       entity_id: switch.siren
-
-- id: alarm_auto_noise_off
-- alias: alarm_auto_noise_off
-  initial_state: true
-    trigger:
-      - platform: state
-        entity_id: alarm_control_panel.house
-        from: 'triggered'
-        to: 'armed_home'
-      - platform: state
-        entity_id: alarm_control_panel.house
-        from: 'triggered'
-        to: 'armed_away'
-      - platform: state
-        entitiy_id: alarm_control_panel.house
-        from: 'triggered'
-        to: 'disarmed'
-    action:
-      - service: switch.turn_off
-        entity_id: switch.siren
 
 - alias: Alarm Disarmed
   trigger: 
